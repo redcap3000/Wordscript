@@ -1,0 +1,63 @@
+## Wordscript
+
+## Wordpress via JSON
+
+## Whats the big idea?
+   
+  Wordpress is ubiquitious. Everyone uses it, is comfortable. Its not going away. I spent some time playing around with
+the JSON API Plugin, and found it easier to work with JSON structures for many applications. I took it a step further
+and wrote a PHP API to connect directly to a wordpress database ( in /scripts/); negating the need for Wordpress
+to be installed; even MySQL in many cases.
+
+## Included
+
+## Javascript wordpress reader (via JSON API Plugin) in js/
+## http://wordpress.org/extend/plugins/json-api/
+
+## PHP API 
+
+## Ronaldo Barbachano April 2012
+## http://doinglines.com
+
+## Coming Soon!
+## A javascript client for the PHP API (Should be simple enough)
+	
+
+## Builds a wordpress site in pure javascript, with ability to view posts by categories (all on a single page).
+
+	Takes the hassle out of handling XHR requests and parsing wordpress data.
+	
+	Makes two XHR calls, does not use jquery. 
+	
+	Basic Usage:
+	
+	Simply put the page somewhere on your wordpress site and provide a url to the wordpress blog (to build the
+	api queries for the plugin). 
+	
+	Make links like:
+	<a href="#" onclick="wp_build_post('?json=- your query with params-')">Link</a>
+	
+	To issue an additional XHR request and rebuild the 'content' div.
+	
+	## Example of this is inside of function wp_build_categories()
+
+	Useful functions:
+	
+	wp_build_posts() - this builds posts. Pass it a url like ?json=<function>&param1=value1, it'll make a xhr call
+	and update the content div (only) change the body onload param to modify what gets show initially
+	
+	
+	_tag() - just a little connivence function that assembles html, haven't decided how much I like it versus 
+	writing html like 'normal'
+	
+	ToDo:
+	
+	Implement pages/links/tags. Should not be hard with function wp_build_posts(). Reuse XHR requests to
+	only use one at a time.
+	
+	Speed it up?
+	
+	Obviously enter any static data as html (categories/links/pages) - as those fields do not change often,
+	cache a json response to a file to load instead of hitting the API all of the time - which seems to be 
+	as intensive (maybe less) than a real wordpress site.
+

@@ -1,0 +1,64 @@
+	Wordscript JSON API (PHP) 
+	Ronaldo Barbachano
+	This provides a simple interfaces for retreving
+	Wordpress MySQL data; without needing an installed/ working
+	version of Wordpress. If a database allows remote connections, the
+	MySQL server could also be remote.
+
+	**WHY**
+	
+	Much faster. Uses a fraction of memory. Design your applications
+	around json structures. Easy to implement in javascript applications.
+	Eventually I will write a ruby version, so the intention is to
+	be able to display wordpress on systems without PHP,MySQL.
+	
+	**HOW**
+	
+	This API generates queries based on passed get parameters to deliver
+	json structures.
+	
+	This can effectively seperate 'development' enviornments from
+	production, and can still allow usage of the administrative interface.
+	
+	**What this won't do**
+	
+	You're going to have to kiss your plugin's goodbye. Its a great time
+	to learn javascript! You can't use this API to modify anything in the
+	database, and this does not track comments or multi-level category hiearchy.
+	
+	**General API Setup**
+	
+	'base url'
+	wp_api.php?json=-directive-/-option-/-option-value/limit/desc-asc
+	
+	also
+	
+	wp_api.php?json=-directive-/limit/desc-asc
+	
+	Examples:
+	
+	(get 10 latests posts)
+	
+	wp_api.php?json=posts/10
+	
+	(get 10 latest posts inside  'news' categories)
+	
+	wp_api.php?json=posts/category/news/10
+	
+	(get categories)
+	
+	wp_api.php?json=categories
+	
+	**Cool _GET options**
+	
+	Add these after the &json= to enable some simple options like...
+	
+	&stats
+	 	--will add basic statistics (load,query count, and memory use)
+	
+	&embed 
+		--will add 'var wp_api=[json];' which should make it easier to include as a javascript
+	&noTag
+		-- Does not look up tags (saves a crap load of queries)
+	&categories
+		-- includes categories (?json=categories)
