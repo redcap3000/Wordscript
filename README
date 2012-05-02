@@ -4,20 +4,22 @@
 
 ## Whats the big idea?
    
-  Wordpress is ubiquitious. Everyone uses it, is comfortable. Its not going away. I spent some time playing around with
-the JSON API Plugin, and found it easier to work with JSON structures for many applications. I took it a step further
-and wrote a PHP API to connect directly to a wordpress database ( in /scripts/); negating the need for Wordpress
-to be installed; even MySQL in many cases.
+Whats the big idea?
+
+Wordpress is ubiquitous. Everyone uses it, is comfortable. Its not going away. I spent some time playing around with the JSON API Plugin, and found it easier to work with JSON structures for many applications. I was not thrilled with still needing to use a wordpress plugin so I began porting the SQL from an old project, ikipress, into simple API's influenced by get parameters in PHP, Ruby and Node.js. Also included is a Node.js javascript that wraps your Wordpress site into html (basically the api with a html wrapper).
+
+The API is designed to be as bare bones as possible, leaving the developer to implement more advanced templating engines or frameworks.
 
 ## Included
 
 ## Javascript wordpress reader (via JSON API Plugin) in js/
 ## http://wordpress.org/extend/plugins/json-api/
 
+## Javascript Node Client
+
 ## PHP API 
+## Ruby API
+## Node API
 
 ## Ronaldo Barbachano April 2012
 ## http://doinglines.com
-
-## Coming Soon!
-## A javascript client for the PHP API (Should be simple enough)
