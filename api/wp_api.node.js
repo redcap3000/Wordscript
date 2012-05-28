@@ -73,7 +73,7 @@ http.createServer(function (req, res) {
 				wp_query += ' and post_type="page" and post_name= "' + url_parts.query.page + '" LIMIT 1;';
 			}else if(typeof(url_parts.query.categories) != 'undefined'){
 				// get category listings
-			}else if (wp_query == ''){
+			}else{
 				wp_query += ' and post_type="post" order by post_date desc LIMIT 10';
 			
 			}
