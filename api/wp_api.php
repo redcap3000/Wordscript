@@ -11,6 +11,8 @@
 
 require('config.php');
 
+if(!isset($_GET['json']))
+    $_GET['json']= 'posts/10';
 // add any extra fields that exist inside of posts table, careful here.
 $default_fields ='id,post_title,post_name,post_author,post_date,post_content,post_type,post_status';
 
@@ -78,11 +80,19 @@ if(isset($_GET['json'])){
 			
 			if(!isset($_GET['noTags'])){
 				foreach($action as $loc=>$post){
+                    // wordpress default seems to be ISO for various fields (meta included) depending on how your wordpress is setup, or
+                    // how the errant fields were created inside the post. This is a case by case thing. Obviously wordpress installations
+                    // that have undergone a lot of upgrades/modifications will be most at risk for fields not being UTF-8 encoded..
+                    
+                    // eventually I will probably write a function that converts everything to utf8 recusively.. but the speed implications
+                    // may be huge..
+                    $post->post_content = utf8_encode($post->post_content);
+                    $post->post_title = utf8_encode($post->post_title);
 					$tags=get_results("select name as tag from ".$config['wp']."posts posts join ".$config['wp']."term_relationships rel on posts.id = rel.object_id join ".$config['wp']."term_taxonomy tax on tax.term_taxonomy_id = rel.term_taxonomy_id join ".$config['wp']."terms term on term.term_id = tax.term_id where posts.post_status = 'publish' and posts.post_type = 'post'  and post_name='".$post->post_name."' and taxonomy = 'post_tag'");
 					if($config['meta']){
 						$meta = get_results("SELECT * FROM ". $config['wp']."postmeta WHERE post_id='".$post->id."' ");
 					// process meta tags, including images and attachments pro
-						foreach($meta as $meta_field){
+						foreach($meta as $mLoc=>$meta_field){
                             
 							if(isset($meta_field->meta_key) && isset($meta_field->meta_value)){
 								// process thumbnail
@@ -139,10 +149,10 @@ if(isset($_GET['json'])){
                                             $action[$loc]->meta ['thumb_width'] = $thumb_data['sizes']['medium']['width'];
                                             $action[$loc]->meta ['thumb_height'] = $thumb_data['sizes']['medium']['height'];
                                     }
-                                    
-								}
-
-								if($meta_field->meta_key == '_attachments_pro'){
+                                 // unset values that are processed in this fashion, to avoid reprocessing them in the case we are
+                                 // dealing with attachments_pro fields
+                                 unset($meta[$mLoc]);   
+								}elseif($meta_field->meta_key == '_attachments_pro'){
 									// Make no mistake.. you'll still need the attachments_pro plug for this to work.
                                                        			 // so this gives us a really cruddy structure of where the post attachments go? and then just filter them into the location when running through the loop..
                                     $attachments = unserialize($meta_field->meta_value);
@@ -191,11 +201,28 @@ if(isset($_GET['json'])){
                                         // properly puts feature posts in order based on attachments_pro
                                         for($z=0;$z< count($struct);$z++){
                                             // move post date up a level to make processing simpler
-                                            $action[$loc]->meta['_attachments_pro'][$z]['post_date'] = $att_ar[$struct[$z]]['post_date'];
+                                            $action[$loc]->meta['_attachments_pro'][$z]['post_date'] = utf8_encode($att_ar[$struct[$z]]['post_date']);
                                             $action[$loc]->meta['_attachments_pro'][$z]['thumb_img'] = $att_ar[$struct[$z]];
                                         }
                                     }
-							}
+                                unset($meta[$mLoc]);
+							//}
+                            //elseif(strpos($meta_field->meta_key,'_') === 0){
+                            // check if its an underscored meta value and store/remove normally
+                            }elseif($meta_field->meta_value != null && trim($meta_field->meta_value) != '' && is_numeric(substr($meta_field->meta_key,-1))){
+                            // contains an array with first element fieldname, second element index
+                            // using that to insert into final row result
+                                $attachment_pro = get_at_pro_index($meta_field->meta_key);
+                                $action[$loc]->meta['_attachments_pro'][$attachment_pro[1]][$attachment_pro[0]] = utf8_encode($meta_field->meta_value);
+                                unset($attachment_pro);
+                            // if the end of the meta_key is numeric, then its an attachments pro key.. this could bite me later..
+                            // step one filter the string to only show numeric
+                                
+                            
+                            }else{
+                                $action[$loc]->meta[$meta_field->meta_key] = utf8_encode($meta_field->meta_value);
+                            
+                            }
 						}
 						if($tags)
 							$action[$loc]->tags = clean_result($tags,'tag');
@@ -211,13 +238,37 @@ if(isset($_GET['json'])){
 	if(isset($_GET['stats']))
 		$action['stats']=sprintf("%.4f", (((float) array_sum(explode(' ',microtime())))-$start_time)) * 1000 ."ms,  using " . round(memory_get_usage() / 1024) . " k  / and $queries queries " ;
 	
-	header('Content-type: application/json');
+	header('Content-type: application/json; charset=utf-8',true,200);
 
 	echo (isset($_GET['embed']) ?'var wp_api='. json_encode($action) . ';':json_encode($action));
 
 		}
 	}
 }
+
+function get_at_pro_index($string,$counter=0){
+// this is finished when it returns an array with the 'index' and the 'fieldname' for the key value
+// give string ..
+        $sub_string = substr($string,-1);
+        if(is_numeric($sub_string)){
+        // remove the value and use it to pass into itself
+            $string = str_replace($sub_string,'',$string);
+            if( $counter == 0){
+                // this should support an unlimited number of fields
+                return get_at_pro_index($string,(string)$sub_string);
+            }else{
+                return get_at_pro_index($string,(string)$counter . (string)$sub_string);    
+            }
+        // keep looping...
+        }elseif($counter !=0){
+        // probably easier to return the index of the field, which would be $counter
+            return array("$string",intval($counter));
+        // you're done return the appropriate variables ? which would be the index (or $counter)
+        }else{
+            return false;
+        }                               
+}
+
 function append_table_alias($alias,$fields){
 	// some advanced wp functions use aliases, this helps me keep all 
 	// field listing consistent and customizable from a single location
