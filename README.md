@@ -13,7 +13,7 @@ version of Wordpress, MySQL, or even PHP (when using node or ruby versions).
 ****
 **New Meta Field Images/Attachments Support**
 
-Wordscript will now support meta fields (PHP version currently, ruby and node versions forthcoming), and also supports the Attachments Pro plugin (it seemed to be popular) including fields. These options can be configured in config.php
+Wordscript will now support meta fields (node version forthcoming), and also supports the Attachments Pro plugin (it seemed to be popular) including fields. These options can be configured in config.php
 
 **WHY**
 
@@ -21,6 +21,36 @@ Much faster. Uses a fraction of memory. Design your applications
 around json structures. Easy to implement in javascript applications. Create your own themes using your own tools. Migrate an existing wordpress installation to use NoSQL technologies.
 
 **HOW**
+
+***Copy an example configuration of the api you'd like to use and supply your information***
+
+	cp config-example.php config.php
+	
+	cp config-example.node.js config.node.sj
+	
+	cp config-example.rb config.rb
+	
+	
+***Install Dependencies***
+
+Node and Ruby api's will need non-standard libraries installable via npm (node package manager) and gem.
+
+***Node Depdendences***
+
+***No npm?***
+
+	gem install npm
+
+	npm install mysql
+
+***Ruby Dependencies***
+
+	gem install mysql2
+	
+	gem install json
+	
+	gem install php_serialize
+	
 
 This API generates queries based on passed get parameters to deliver
 json structures.
@@ -41,25 +71,25 @@ Eventually I would like to create a basic templating construct, allowing users t
 
 ***base url***
 	
-	wp_api.php?json=-directive-/-option-/-option-value/limit/desc-asc
+	?json=-directive-/-option-/-option-value/limit/desc-asc
 
 ***also***
 
-	wp_api.php?json=-directive-/limit/desc-asc
+	?json=-directive-/limit/desc-asc
 
 ***Examples:***
 
 	(get 10 latests posts)
 
-	wp_api.php?json=posts/10
+	?json=posts/10
 
 	(get 10 latest posts inside  'news' categories)
 
-	wp_api.php?json=posts/category/news/10
+	?json=posts/category/news/10
 
 	(get categories)
 
-	wp_api.php?json=categories
+	?json=categories
 
 **Cool _GET options**
 
