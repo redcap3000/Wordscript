@@ -26,7 +26,7 @@ around json structures. Easy to implement in javascript applications. Create you
 
 	cp config-example.php config.php
 	
-	cp config-example.node.js config.node.sj
+	cp config-example.node.js config.node.js
 	
 	cp config-example.rb config.rb
 	
